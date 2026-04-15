@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "insta-scraper"
+version = "0.1.0"
+description = "Cron-friendly Instagram keyword collector"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "instaloader>=4.14,<5",
+]
+
+[project.scripts]
+insta-scraper = "insta_scraper.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
