@@ -14,7 +14,6 @@ def initialize_database(path: str | Path) -> None:
     db_path = Path(path)
     db_path.parent.mkdir(parents=True, exist_ok=True)
     with connect(db_path) as conn:
-        conn.execute("PRAGMA foreign_keys = ON")
         conn.executescript(
             """
             CREATE TABLE IF NOT EXISTS runs (
@@ -65,6 +64,9 @@ def connect(path: str | Path):
     try:
         yield conn
         conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
     finally:
         conn.close()
 
@@ -94,7 +96,7 @@ def store_posts(conn: sqlite3.Connection, run_id: int, posts: Iterable[ScrapedPo
     for post in posts:
         conn.execute(
             """
-            INSERT OR REPLACE INTO posts (
+            INSERT OR IGNORE INTO posts (
                 run_id, source_type, source_value, shortcode, url, posted_at, caption
             ) VALUES (?, ?, ?, ?, ?, ?, ?)
             """,
